@@ -160,10 +160,7 @@ class _CategoriesTabState extends State<CategoriesTab> {
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-
                             const SizedBox(height: 8),
-
-
                           ],
                         ),
                       ),
