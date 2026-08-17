@@ -13,6 +13,7 @@ class AddHabitTab extends StatefulWidget {
   State<AddHabitTab> createState() => _AddHabitTabState();
 }
 
+
 class _AddHabitTabState extends State<AddHabitTab> {
   static const List<String> _categories = ['Study', 'Fitness', 'Mindset'];
 
