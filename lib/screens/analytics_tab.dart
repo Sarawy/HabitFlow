@@ -4,7 +4,7 @@ import '../models/habit.dart';
 class AnalyticsTab extends StatelessWidget {
   final List<Habit> habits;
 
-  
+
   const AnalyticsTab({
     super.key,
     required this.habits,
