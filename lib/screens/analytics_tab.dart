@@ -14,9 +14,9 @@ class AnalyticsTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final int totalHabits = habits.length;
     final int completedCount = habits.where((h) => h.isCompleted).length;
-    final double completionRate=
-        totalHabits > 0 ? completedCount / totalHabits:0.0;
-    final int percentage = (completedCount * 100).toInt();
+    final double completionRate =
+        totalHabits == 0 ? 0.0 : completedCount / totalHabits;
+    final int percentage = (completionRate * 100).round();
 
     Habit? bestStreakHabits;
     if (habits.isNotEmpty){
