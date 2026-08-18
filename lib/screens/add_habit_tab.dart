@@ -33,7 +33,7 @@ class _AddHabitTabState extends State<AddHabitTab> {
     }
 
     final newHabit = Habit(
-      id: DateTime.now().toString(),
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
       title: _titleController.text.trim(),
       category: _selectedCategory!,
     );
