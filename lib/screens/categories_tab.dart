@@ -166,10 +166,9 @@ class _CategoriesTabState extends State<CategoriesTab> {
                       ),
 
                       IconButton(
+                        tooltip: 'Delete habit',
                         icon: const Icon(Icons.delete_outline),
-                        onPressed: () {
-                          widget.onDelete(habit.id);
-                        },
+                        onPressed: () => widget.onDelete(habit.id),
                       ),
                     ],
                   ),
