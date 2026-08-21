@@ -13,10 +13,44 @@ class TodayTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('TODO: Implement UI'),
+    if (habits.isEmpty) {
+      return const Center(
+        child: Text(
+          'No habits for today. Add one!',
+          style: TextStyle(
+            fontSize: 18,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: habits.length,
+      itemBuilder: (context, index) {
+        final habit = habits[index];
+
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: CheckboxListTile(
+            value: habit.isCompleted,
+            onChanged: (_) {
+              onToggle(habit.id);
+            },
+            title: Text(
+              habit.title,
+              style: TextStyle(
+                decoration: habit.isCompleted
+                    ? TextDecoration.lineThrough
+                    : TextDecoration.none,
+              ),
+            ),
+            subtitle: Text(
+              '🔥 ${habit.streak} days',
+            ),
+          ),
+        );
+      },
     );
   }
 }
-
-
