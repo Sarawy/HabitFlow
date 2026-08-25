@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../database/database_helper.dart';
 import '../models/habit.dart';
 import 'today_tab.dart';
 import 'add_habit_tab.dart';
@@ -12,69 +13,74 @@ class MainShell extends StatefulWidget {
   State<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell> {
+class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   int _selectedIndex = 0;
 
-  /// Master list of habits
-  late List<Habit> habits;
+  /// Master list of habits, loaded from SQLite
+  List<Habit> habits = [];
 
   @override
   void initState() {
     super.initState();
-    // Initialize with 3 dummy items
-    habits = [
-      Habit(
-        id: '1',
-        title: 'Morning Meditation',
-        category: 'Mindset',
-        isCompleted: false,
-        streak: 5,
-      ),
-      Habit(
-        id: '2',
-        title: 'Read 30 Minutes',
-        category: 'Study',
-        isCompleted: true,
-        streak: 12,
-      ),
-      Habit(
-        id: '3',
-        title: 'Gym Workout',
-        category: 'Fitness',
-        isCompleted: false,
-        streak: 3,
-      ),
-    ];
+    WidgetsBinding.instance.addObserver(this);
+    _loadHabits();
   }
 
-  /// Toggles the completion status of a habit and updates streak
-  void _toggleHabit(String id) {
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Reload when the app resumes so a new day's checkbox state refreshes.
+    if (state == AppLifecycleState.resumed) {
+      _loadHabits();
+    }
+  }
+
+  /// Loads all habits from the database into the local list
+  Future<void> _loadHabits() async {
+    final loadedHabits = await DatabaseHelper.instance.getHabits();
+
+    if (!mounted) return;
+
     setState(() {
-      final index = habits.indexWhere((h) => h.id == id);
-      if (index != -1) {
-        habits[index] = habits[index].copyWith(
-          isCompleted: !habits[index].isCompleted,
-          streak: habits[index].isCompleted
-              ? habits[index].streak - 1
-              : habits[index].streak + 1,
-        );
-      }
+      habits = loadedHabits;
     });
   }
 
-  /// Adds a new habit to the list and switches back to Today tab
-  void _addHabit(Habit habit) {
+  /// Toggles today's completion for a habit, then reloads habits/streaks
+  void _toggleHabit(String id) async {
+    final index = habits.indexWhere((h) => h.id == id);
+    if (index == -1) return;
+
+    if (habits[index].isCompleted) {
+      await DatabaseHelper.instance.uncompleteHabitToday(id);
+    } else {
+      await DatabaseHelper.instance.completeHabitToday(id);
+    }
+
+    await _loadHabits();
+  }
+
+  /// Adds a new habit to the database and switches back to Today tab
+  void _addHabit(Habit habit) async {
+    await DatabaseHelper.instance.insertHabit(habit);
+    await _loadHabits();
+
+    if (!mounted) return;
+
     setState(() {
-      habits.add(habit);
       _selectedIndex = 0; // Switch back to Today tab
     });
   }
 
   /// Removes a habit by ID
-  void _deleteHabit(String id) {
-    setState(() {
-      habits.removeWhere((h) => h.id == id);
-    });
+  void _deleteHabit(String id) async {
+    await DatabaseHelper.instance.deleteHabit(id);
+    await _loadHabits();
   }
 
   @override
