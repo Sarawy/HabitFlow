@@ -29,5 +29,27 @@ class Habit {
       streak: streak ?? this.streak,
     );
   }
+
+  /// Converts this habit into a map for storing in SQLite
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'category': category,
+      'isCompleted': isCompleted ? 1 : 0,
+      'streak': streak,
+    };
+  }
+
+  /// Creates a habit from a SQLite row map
+  factory Habit.fromMap(Map<String, dynamic> map) {
+    return Habit(
+      id: map['id'] as String,
+      title: map['title'] as String,
+      category: map['category'] as String,
+      isCompleted: (map['isCompleted'] as int) == 1,
+      streak: map['streak'] as int,
+    );
+  }
 }
 
