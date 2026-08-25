@@ -97,16 +97,18 @@ class DatabaseHelper {
   /// Deletes a habit and its completion history
   Future<void> deleteHabit(String id) async {
     final db = await database;
-    await db.delete(
-      'habit_completions',
-      where: 'habit_id = ?',
-      whereArgs: [id],
-    );
-    await db.delete(
-      'habits',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await db.transaction((txn) async {
+      await txn.delete(
+        'habit_completions',
+        where: 'habit_id = ?',
+        whereArgs: [id],
+      );
+      await txn.delete(
+        'habits',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    });
   }
 
   /// Marks a habit as completed for today (no-op if already completed)
